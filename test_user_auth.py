@@ -1,27 +1,75 @@
+import pytest
 import requests
 
 
 class TestUserAuth:
 
     def test_auth_user(self):
-        data = {"email": "vinkotov@example.com", "password": "1234"}
+        data = {"email": "vinkotov@example.com",
+                "password": "1234"
+                }
 
         response = requests.post(
             "https://playground.learnqa.ru/api/user/login", data=data)
+
+        # print(dict(response.cookies))
+        # print(response.headers["x-csrf-token"])
+        # print(response.json())
+
         assert "auth_sid" in response.cookies, "There in no auth cookie in the response"
         assert "x-csrf-token" in response.headers, "There in no CSRF token header in the response"
-        assert "user_id" in response.json(
-        ), "The in no user id in the response"
+        assert "user_id" in response.json(), "There in no user id in the response"
 
         auth_sid = response.cookies.get("auth_sid")
         token = response.headers.get("x-csrf-token")
         user_id_from_auth_method = response.json()['user_id']
 
-        response_sava_result = requests.get(
+        # print(auth_sid)
+        # print(token)
+        # print(user_id_from_auth_method)
+
+        response_auth = requests.get(
             "https://playground.learnqa.ru/api/user/auth",
             headers={"x-csrf-token": token},
             cookies={"auth_sid": auth_sid})
-        assert "user_id" in response_sava_result.json(
-        ), "The is no user id in the second response"
-        user_id_from_check_method = response_sava_result.json()["user_id"]
+
+        assert "user_id" in response_auth.json(), "The is no user id in the second response"
+        user_id_from_check_method = response_auth.json()["user_id"]
         assert user_id_from_auth_method == user_id_from_check_method, "User id from auth method is not equal to user from check method"
+
+
+
+    exclude_params = [
+        ("no_cookie"),
+        ("no_token")
+    ]
+    @pytest.mark.parametrize("condition", exclude_params)
+    def test_negative_auth_check(self, condition):
+        data = {"email": "vinkotov@example.com",
+                "password": "1234"
+                }
+
+        response = requests.post(
+            "https://playground.learnqa.ru/api/user/login", data=data)
+
+        assert "auth_sid" in response.cookies, "There in no auth cookie in the response"
+        assert "x-csrf-token" in response.headers, "There in no CSRF token header in the response"
+        assert "user_id" in response.json(), "There in no user id in the response"
+
+        auth_sid = response.cookies.get("auth_sid")
+        token = response.headers.get("x-csrf-token")
+
+        if condition == "no_cookie":
+            response_negative_case = requests.get(
+                "https://playground.learnqa.ru/api/user/auth", headers={"x-csrf-token": token}
+            )
+        else:
+            response_negative_case = requests.get(
+                "https://playground.learnqa.ru/api/user/auth", cookies={"auth_sid": auth_sid}
+            )
+
+        assert "user_id" in response_negative_case.json(), "There is no user id in the second response"
+
+        user_id_from_check_method = response_negative_case.json()["user_id"]
+
+        assert user_id_from_check_method == 0, f"User is authorized with condition {condition}"
