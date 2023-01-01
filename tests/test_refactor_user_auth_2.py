@@ -1,8 +1,8 @@
 import pytest
 import requests
+from ..lib.base_case import BaseCase
 
-
-class TestUserAuth:
+class TestUserAuth(BaseCase):
     exclude_params = [
         ("no_cookie"),
         ("no_token")
@@ -15,13 +15,13 @@ class TestUserAuth:
         response = requests.post(
             "https://playground.learnqa.ru/api/user/login", data=data)
 
-        assert "auth_sid" in response.cookies, "There in no auth cookie in the response"
-        assert "x-csrf-token" in response.headers, "There in no CSRF token header in the response"
-        assert "user_id" in response.json(), "There in no user id in the response"
+        self.auth_sid = self.get_cookie(response, "auth_sid")
+        self.token = self.get_header(response, "x-csrf-token")
+        self.user_id_from_auth_method = self.get_json_value(response, "user_id")
 
-        self.auth_sid = response.cookies.get("auth_sid")
-        self.token = response.headers.get("x-csrf-token")
+        assert "user_id" in response.json(), "There in no user id in the response"
         self.user_id_from_auth_method = response.json()['user_id']
+
     def test_auth_user(self):
 
         response_auth = requests.get(
