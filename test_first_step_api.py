@@ -1,4 +1,3 @@
-from urllib import response
 import requests
 
 
@@ -6,7 +5,7 @@ class TestFirstStepApi:
 
     def test_check_status_code(self):
         url = "https://playground.learnqa.ru/api/hello"
-        name = "Sasha"
+        name = "Alex"
         data = {"name": name}
 
         response = requests.get(url, params=data)

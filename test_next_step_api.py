@@ -1,12 +1,14 @@
-from unicodedata import name
-from urllib import response
 import pytest
 import requests
 
 
 class TestNextStepAPI:
     #параметризованные тесты
-    names = [("Vitalii"), ("Alex"), ("Lena"), ("Gosha"), ("")]
+    names = [
+        ("Vitalii"),
+        ("Alex"),
+        ("")
+    ]
 
     @pytest.mark.parametrize('name', names)
     def test_check_status_code(self, name):

@@ -1,3 +1,6 @@
+#start test
+#python3 -m pytest test_examples.py
+#python3 -m pytest test_examples.py -k test_check_math_sum
 class TestExample:
 
     def test_check_math_sum(self):
