@@ -69,7 +69,5 @@ class TestUserAuth:
             )
 
         assert "user_id" in response_negative_case.json(), "There is no user id in the second response"
-
         user_id_from_check_method = response_negative_case.json()["user_id"]
-
         assert user_id_from_check_method == 0, f"User is authorized with condition {condition}"
