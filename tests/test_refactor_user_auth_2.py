@@ -19,8 +19,6 @@ class TestUserAuth(BaseCase):
         self.token = self.get_header(response, "x-csrf-token")
         self.user_id_from_auth_method = self.get_json_value(response, "user_id")
 
-        assert "user_id" in response.json(), "There in no user id in the response"
-        self.user_id_from_auth_method = response.json()['user_id']
 
     def test_auth_user(self):
 
